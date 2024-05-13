@@ -10,7 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import os
+import re
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,14 +28,25 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-8xf0+91!em2o5lex18fa(e((2w9-2=6dne52(dz0z@4(sasl(#'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'true').lower() == 'true'
 
-ALLOWED_HOSTS = []
+DJANGO_VITE_DEV_MODE = DEBUG
+# Using the same port as the dev port defined in vite.config.js
+DJANGO_VITE_DEV_SERVER_PORT = 3000
+# DJANGO_VITE_STATIC_URL_PREFIX = BASE_DIR / 'frontend' / 'static' / 'dist'
+DJANGO_VITE_MANIFEST_PATH = BASE_DIR / 'frontend' / \
+    'static' / 'dist' / '.vite' / 'manifest.json'
+
+ALLOWED_HOSTS = ['*']
+CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:8000", ]
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
 
 
 # Application definition
 
 BASE_APPS = [
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,9 +59,14 @@ LOCAL_APPS = [
     'backend.apps.BackendConfig',
 ]
 
-INSTALLED_APPS = BASE_APPS + LOCAL_APPS
+THIRD_APPS = [
+    'django_vite',
+]
+
+INSTALLED_APPS = BASE_APPS + LOCAL_APPS + THIRD_APPS
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
