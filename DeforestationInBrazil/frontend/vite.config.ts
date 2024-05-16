@@ -8,7 +8,8 @@ import VueDevTools from 'vite-plugin-vue-devtools';
 
 
 const env = loadEnv("mode", process.cwd(), "");
-const isProduction = env.TARGET_ENV === "production";
+const INPUT_DIR = "./src";
+const OUTPUT_DIR = "./static/dist";
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [vue(), vueJsx(), VueDevTools(),],
@@ -19,20 +20,20 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@": fileURLToPath(new URL("./src", import.meta.url)),
+      "@": path.resolve(INPUT_DIR),
     },
   },
   root: path.resolve("./src"),
-  base: isProduction ? "" : "/static/",
+  base: "/static/",
   build: {
-    outDir: path.resolve("./static/dist"),
+    outDir: path.resolve(OUTPUT_DIR),
     assetsDir: "",
     manifest: true,
     emptyOutDir: true,
     target: "es2015",
     rollupOptions: {
       input: {
-        main: path.resolve("./src/main.ts"),
+        main: path.join(INPUT_DIR, "/main.ts"),
       },
       output: {
         chunkFileNames: undefined,
@@ -40,7 +41,6 @@ export default defineConfig({
     },
   },
   server: {
-    origin: "http://localhost:3000",
     host: "localhost",
     port: 3000,
     open: false,
