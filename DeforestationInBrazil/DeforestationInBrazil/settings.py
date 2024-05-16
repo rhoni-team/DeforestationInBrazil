@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-8xf0+91!em2o5lex18fa(e((2w9-2=6dne52(dz0z@4(sasl(#
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'true').lower() == 'true'
-
+print(f"DEBUG: {DEBUG}")
 DJANGO_VITE_DEV_MODE = DEBUG
 # Using the same port as the dev port defined in vite.config.js
 DJANGO_VITE_DEV_SERVER_PORT = 3000
