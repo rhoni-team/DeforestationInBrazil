@@ -73,7 +73,6 @@ jobs:
     - name: Run Linter with ESLint
       working-directory: DeforestationInBrazil/frontend
       run: npx eslint --max-warnings 0
-      continue-on-error: true
 
     - name: Run Unit Tests with Vitest
       working-directory: DeforestationInBrazil/frontend
