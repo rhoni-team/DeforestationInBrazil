@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+{% load static %}
+{% load django_vite %}
+
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deforestation</title>
+    {% vite_hmr_client %}
+    {% vite_asset 'main.ts'%}
+</head>
+<body>
+    <h1>Hello rhoni! this is the entry point in Django</h1>
+    <div id="app"></div>
+</body>
+</html>

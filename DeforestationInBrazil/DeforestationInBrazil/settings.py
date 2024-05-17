@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 import os
+import re
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -27,14 +28,25 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-8xf0+91!em2o5lex18fa(e((2w9-2=6dne52(dz0z@4(sasl(#'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'true').lower() == 'true'
+print(f"DEBUG: {DEBUG}")
+DJANGO_VITE_DEV_MODE = DEBUG
+# Using the same port as the dev port defined in vite.config.js
+DJANGO_VITE_DEV_SERVER_PORT = 3000
+# DJANGO_VITE_STATIC_URL_PREFIX = BASE_DIR / 'frontend' / 'static' / 'dist'
+DJANGO_VITE_MANIFEST_PATH = BASE_DIR / 'frontend' / \
+    'static' / 'dist' / '.vite' / 'manifest.json'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
+CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:8000", ]
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
 
 
 # Application definition
 
 BASE_APPS = [
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -47,10 +59,16 @@ LOCAL_APPS = [
     'backend.apps.BackendConfig',
 ]
 
-INSTALLED_APPS = BASE_APPS + LOCAL_APPS
+THIRD_APPS = [
+    'django_vite',
+]
+
+INSTALLED_APPS = BASE_APPS + LOCAL_APPS + THIRD_APPS
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -129,9 +147,35 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'static'
+STATIC_URL = "static/"
+DJANGO_VITE_ASSETS_PATH = BASE_DIR / 'frontend' / 'static' / 'dist'
+STATICFILES_DIRS = [
+    DJANGO_VITE_ASSETS_PATH,
+]
+
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": 'whitenoise.storage.CompressedStaticFilesStorage',
+    },
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# pylint: disable=unused-argument
+# Vite generates files with 8 hash digits
+# http://whitenoise.evans.io/en/stable/django.html#WHITENOISE_IMMUTABLE_FILE_TEST
+
+
+def immutable_file_test(path, url):
+    ''' Match filename with 12 hex digits before the extension
+    # e.g. app.db8f2edc0c8a.js '''
+    return re.match(r"^.+\.[0-9a-f]{8,12}\..+$", url)
+
+
+WHITENOISE_IMMUTABLE_FILE_TEST = immutable_file_test
+
+DEBUG_PROPAGATE_EXCEPTIONS = False
