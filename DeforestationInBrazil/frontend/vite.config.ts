@@ -41,6 +41,7 @@ export default defineConfig({
     },
   },
   server: {
+    origin: "http://localhost:3000",
     host: "localhost",
     port: 3000,
     open: false,
