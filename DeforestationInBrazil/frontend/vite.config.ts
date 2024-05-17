@@ -1,5 +1,4 @@
 /// <reference types="vitest" />
-import { fileURLToPath, URL } from "node:url";
 import path from "node:path";
 import { defineConfig, loadEnv } from "vite";
 import vue from "@vitejs/plugin-vue";
@@ -7,7 +6,6 @@ import vueJsx from "@vitejs/plugin-vue-jsx";
 import VueDevTools from 'vite-plugin-vue-devtools';
 
 
-const env = loadEnv("mode", process.cwd(), "");
 const INPUT_DIR = "./src";
 const OUTPUT_DIR = "./static/dist";
 // https://vitejs.dev/config/
